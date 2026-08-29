@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hr app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=2.1.0">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="navbar">
+        <div class="brand">
+            <h1>Hr app</h1>
+        </div>
+        <div class="nav-actions">
+            {% if user %}
+            <div style="display: flex; align-items: center; gap: 8px;">
+                {% if user.picture %}
+                <img src="{{ user.picture }}" alt="Profile" style="width: 24px; height: 24px; border-radius: 50%;">
+                {% endif %}
+                <span style="font-size: 0.82rem; font-weight: 600; color: #111827;">{{ user.name }}</span>
+                <a href="/logout" class="btn btn-secondary" style="padding: 3px 8px; font-size: 0.75rem; text-decoration: none;">Sign Out</a>
+            </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Top Navigation Bar Tabs -->
+        <div class="top-nav-tabs">
+            <button id="navTabJobs" class="top-nav-tab active" onclick="switchTopTab('jobs')">
+                Job Requirements
+            </button>
+            <button id="navTabUpload" class="top-nav-tab" onclick="switchTopTab('upload')">
+                Upload Resume
+            </button>
+        </div>
+
+        <!-- ==================================================================== -->
+        <!-- TAB 1 VIEW: JOB REQUIREMENTS (20/80 LAYOUT) -->
+        <!-- ==================================================================== -->
+        <div id="sectionJobRequirements">
+            <div class="dashboard-layout">
+                
+                <!-- Left Column (20%): Job Requirement Form -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title" id="jobFormHeaderTitle">Create Job Requirement</h2>
+                        <button id="btnCancelEdit" class="btn btn-secondary" style="display: none; padding: 2px 6px; font-size: 0.72rem;" onclick="resetJobForm()">
+                            Cancel
+                        </button>
+                    </div>
+
+                    <form id="jobForm">
+                        <input type="hidden" id="editingJobId" value="">
+
+                        <div class="form-group">
+                            <label for="jobTitle">Job Title</label>
+                            <input type="text" id="jobTitle" class="form-control" placeholder="e.g. Python Engineer" value="Python Engineer" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jobDepartment">Department</label>
+                            <input type="text" id="jobDepartment" class="form-control" placeholder="e.g. Engineering" value="Engineering">
+                        </div>
+                        <div class="form-group">
+                            <label for="requiredSkills">Required Skills</label>
+                            <input type="text" id="requiredSkills" class="form-control" placeholder="Python, FastAPI, PostgreSQL" value="Python, FastAPI, PostgreSQL" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="preferredSkills">Preferred Skills</label>
+                            <input type="text" id="preferredSkills" class="form-control" placeholder="Docker, AWS" value="Docker, AWS">
+                        </div>
+                        <div class="form-group">
+                            <label for="minExp">Min Experience (Yrs)</label>
+                            <input type="number" id="minExp" class="form-control" min="0" max="20" value="2">
+                        </div>
+                        <div class="form-group">
+                            <label for="jobDescription">Job Details</label>
+                            <textarea id="jobDescription" class="form-control" required placeholder="Paste job overview...">We are looking for a Python Engineer with FastAPI and PostgreSQL experience.</textarea>
+                        </div>
+                        <button type="submit" id="btnSubmitJob" class="btn btn-primary" style="width: 100%;">Create Job Requirement</button>
+                    </form>
+                </div>
+
+                <!-- Right Column (80%): List of Created Jobs -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h2 class="panel-title">Created Job Postings</h2>
+                            <span style="font-size: 0.78rem; color: #6b7280;">(Total: {{ jobs|length }})</span>
+                        </div>
+                        <input type="text" id="searchJobsInput" class="search-input-box" placeholder="Search jobs...">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;">S.No</th>
+                                    <th>Job Title</th>
+                                    <th>Department</th>
+                                    <th>Required Skills</th>
+                                    <th>Min Exp</th>
+                                    <th style="width: 80px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobsListTableBody">
+                                {% for job in jobs %}
+                                {% set skills_full = job.required_skills|join(', ') %}
+                                {% set skills_short = skills_full[:18] + ('...' if skills_full|length > 18 else '') %}
+                                <tr class="job-row-item" data-title="{{ job.title|lower }}" data-dept="{{ job.department|lower }}" data-skills="{{ skills_full|lower }}">
+                                    <td style="font-weight: 600; color: #6b7280;">{{ loop.index }}</td>
+                                    <td style="font-weight: 600;">{{ job.title }}</td>
+                                    <td style="color: #4b5563;">{{ job.department or 'N/A' }}</td>
+                                    <td class="plain-skill-text">
+                                        <span class="truncated-skills" title="{{ skills_full }}">{{ skills_short }}</span>
+                                    </td>
+                                    <td style="font-weight: 500;">{{ job.min_experience_years }} yrs</td>
+                                    <td style="text-align: center;">
+                                        <div style="display: flex; gap: 4px; justify-content: center;">
+                                            <!-- Pencil Icon for Edit -->
+                                            <button class="btn-icon" onclick="editJobFromList({{ job.id }})" title="Edit Job">
+                                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <!-- Bucket (trash) Icon for Delete -->
+                                            <button class="btn-icon btn-icon-danger" onclick="deleteJobFromList({{ job.id }}, '{{ job.title|e }}')" title="Delete Job">
+                                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: #6b7280; padding: 24px;">
+                                        No Job Requirements created yet.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==================================================================== -->
+        <!-- TAB 2 VIEW: UPLOAD RESUME & SCREENINGS (20/80 LAYOUT) -->
+        <!-- ==================================================================== -->
+        <div id="sectionUploadResume" style="display: none;">
+            <div class="dashboard-layout">
+                
+                <!-- Left Column (20%): Upload Resumes Widget -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Upload Resume</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="selectJobFilter">Target Job</label>
+                        <select id="selectJobFilter" class="form-control">
+                            {% for job in jobs %}
+                            <option value="{{ job.id }}" {% if loop.first %}selected{% endif %}>{{ job.title }} (ID: {{ job.id }})</option>
+                            {% else %}
+                            <option value="">No Jobs Available</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="drop-zone" id="dropZone" style="margin-top: 12px;">
+                        <div style="font-weight: 600; color: #374151;">Drop files or click</div>
+                        <p style="font-size: 0.72rem; color: #6b7280; margin-top: 4px;">PDF, DOCX, TXT</p>
+                        <input type="file" id="resumeFileInput" multiple accept=".pdf,.docx,.txt,.md" style="display: none;">
+                    </div>
+                    <div id="fileListDisplay"></div>
+
+                    <button id="btnUploadScreen" class="btn btn-primary" style="width: 100%; margin-top: 12px;">
+                        Upload & Screen
+                    </button>
+                </div>
+
+                <!-- Right Column (80%): Screening Results Rankings Table -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h2 class="panel-title">Screening Results</h2>
+                            <button id="btnRescreen" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.72rem;">
+                                Re-evaluate All
+                            </button>
+                        </div>
+                        <input type="text" id="searchCandidatesInput" class="search-input-box" placeholder="Search candidates...">
+                    </div>
+
+                    <!-- Bulk Action Bar -->
+                    <div id="bulkActionBar" style="display: none; align-items: center; justify-content: space-between; background: #f3f4f6; border: 1px solid #d1d5db; padding: 6px 12px; border-radius: 6px; margin-bottom: 12px;">
+                        <span style="font-size: 0.8rem; font-weight: 600; color: #374151;">
+                            <span id="selectedCountBadge">0</span> selected
+                        </span>
+                        <button id="btnBulkDelete" class="btn btn-icon-danger" style="padding: 4px 8px; font-size: 0.75rem;">
+                            Delete Selected
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px; text-align: center;">
+                                        <input type="checkbox" id="selectAllCheckbox" title="Select All">
+                                    </th>
+                                    <th style="width: 50px;">Rank</th>
+                                    <th>Candidate</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                    <th>Key Skills</th>
+                                    <th style="width: 80px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: #6b7280; padding: 24px;">
+                                        Select a job description to view evaluated candidate rankings.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Candidate Evaluation Detail Modal -->
+    <div class="modal-overlay" id="candidateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1rem; font-weight: 700; color: #111827;">Candidate Evaluation Report</h3>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div id="modalBody">
+                <!-- Populated via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js?v=2.1.0"></script>
+</body>
+</html>

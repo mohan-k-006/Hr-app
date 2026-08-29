@@ -1,0 +1,17 @@
+Priya Sharma
+Email: priya.sharma@example.com
+Phone: +91 9123456789
+
+SUMMARY:
+Senior Python Developer with 4 years of experience building high-performance asynchronous microservices using FastAPI, Python, PostgreSQL, and AWS cloud infrastructure.
+
+TECHNICAL SKILLS:
+- Core: Python, FastAPI, REST APIs, PostgreSQL, SQLAlchemy, Git, Docker, AWS (EC2, S3), Pytest, CI/CD
+
+EXPERIENCE:
+Python Developer | CloudTech Systems | 2020 - Present
+- Architected high-throughput FastAPI microservices backends with PostgreSQL DB.
+- Deployed containerized applications to AWS EC2 using Docker and GitHub Actions.
+
+EDUCATION:
+B.Tech Computer Science | National Institute of Technology | 2016 - 2020

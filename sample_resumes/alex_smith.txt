@@ -1,0 +1,18 @@
+Alex Smith
+Email: alex.smith@example.com
+Phone: +1 555 019 2831
+
+SUMMARY:
+Junior Frontend & Java Developer with 1 year experience developing web pages using HTML, CSS, JavaScript, and Java Spring Boot.
+
+TECHNICAL SKILLS:
+- Languages: Java, JavaScript, HTML, CSS
+- Frameworks: Spring Boot, Bootstrap
+- Database: MySQL
+
+EXPERIENCE:
+Junior Web Developer | WebCraft LLC | 2023 - 2024
+- Developed responsive web pages and simple Java Spring Boot APIs.
+
+EDUCATION:
+Bachelor of Computer Applications (BCA) | 2020 - 2023

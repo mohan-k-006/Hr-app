@@ -1,0 +1,24 @@
+Rahul Kumar
+Email: rahul.kumar@example.com
+Phone: +91 9876543210
+Location: Bengaluru, India
+
+SUMMARY:
+Software Developer with 3+ years of hands-on experience in Python backend development, REST API design, relational database modeling with PostgreSQL, and version control using Git. Experienced with Docker containerization.
+
+TECHNICAL SKILLS:
+- Languages: Python, SQL, C++
+- Databases: PostgreSQL, SQLite
+- APIs: REST APIs, Flask, Django
+- Tools & DevOps: Git, GitHub, Docker, Linux, Postman
+- Testing: unittest, pytest
+
+EXPERIENCE:
+Software Engineer | TechSolutions Ltd | 2021 - Present
+- Built and maintained scalable Python backend web services processing 50k requests daily.
+- Designed relational database schemas in PostgreSQL and optimized complex SQL queries.
+- Created robust REST APIs for internal and customer-facing microservices.
+- Automated deployment workflows using Docker containers and Git.
+
+EDUCATION:
+B.Tech in Computer Science and Engineering | XYZ Institute of Technology | 2017 - 2021
